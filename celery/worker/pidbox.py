@@ -120,5 +120,13 @@ class gPidbox(Pidbox):
                         connection.drain_events(timeout=1.0)
                     except socket.timeout:
                         pass
+                    except IOError as e:
+                        # socket.timeout is of the type IOError, it must go
+                        # before this
+                        if 'Socket closed' in str(e):
+                            # Thank you for playing Wing Commander!
+                            logger.debug("Heartbeat socket closed, this is fine; ignoring.")
+                        else:
+                            raise
         finally:
             stopped.set()
